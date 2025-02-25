@@ -1,1 +1,12 @@
 # spring-security
+
+
+1단계 - SecurityFilterChain 리팩터링
+
+기존에 SecurityFilterChain과 필터 리스트를 명시적으로 구성하던 방식을 HttpSecurity와 스프링 시큐리티의 다양한 설정자(Configurer)를 활용하여 리팩터링한다. 
+각 단계별로 필터를 리팩터링하고, 
+스프링 부트의 Auto Configuration을 통해 기본 보안 설정을 활성화할 수 있도록 리팩터링하는 것을 목표로 한다.
+
+- [X] HttpSecurity 객체 생성
+- [X] HttpSecurity 에 csrf 필터 연결 
+

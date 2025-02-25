@@ -9,22 +9,19 @@ import nextstep.security.access.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public class CsrfFilter extends OncePerRequestFilter {
-    public static final RequestMatcher DEFAULT_CSRF_MATCHER = new DefaultRequiresCsrfMatcher();
-
-    private final RequestMatcher requireCsrfProtectionMatcher = DEFAULT_CSRF_MATCHER;
+    private final RequestMatcher requireCsrfProtectionMatcher;
     private final AccessDeniedHandler accessDeniedHandler = new AccessDeniedHandler();
-    private CsrfTokenRepository tokenRepository = new CsrfTokenRepository();
-
+    private final CsrfTokenRepository tokenRepository;
     private final Set<MvcRequestMatcher> ignoringRequestMatchers;
 
-    public CsrfFilter(Set<MvcRequestMatcher> ignoringRequestMatchers) {
+    public CsrfFilter(RequestMatcher requireCsrfProtectionMatcher, Set<MvcRequestMatcher> ignoringRequestMatchers) {
+        this.requireCsrfProtectionMatcher = requireCsrfProtectionMatcher;
         this.ignoringRequestMatchers = ignoringRequestMatchers;
+        this.tokenRepository  = new CsrfTokenRepository();
     }
 
     @Override
@@ -64,21 +61,5 @@ public class CsrfFilter extends OncePerRequestFilter {
         }
 
         return !Objects.equals(csrfToken.getToken(), actualToken);
-    }
-
-    private static final class DefaultRequiresCsrfMatcher implements RequestMatcher {
-
-        private final HashSet<String> allowedMethods = new HashSet<>(Arrays.asList("GET", "HEAD", "TRACE", "OPTIONS"));
-
-        @Override
-        public boolean matches(HttpServletRequest request) {
-            return !this.allowedMethods.contains(request.getMethod());
-        }
-
-        @Override
-        public String toString() {
-            return "CsrfNotRequired " + this.allowedMethods;
-        }
-
     }
 }
