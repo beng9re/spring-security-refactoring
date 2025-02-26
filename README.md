@@ -15,3 +15,8 @@
 기존에 직접 추가하던 UsernamePasswordAuthenticationFilter와 BasicAuthenticationFilter를 HttpSecurity의 .formLogin()과 .httpBasic() 메서드를 사용해 설정하는 방식으로 리팩터링한다.
 - [X] formLogin 추가 
 - [X] httpBasic 추가 
+
+3단계 - 인가 관련 리팩터링
+기존에 직접 추가하던 AuthorizationFilter를 HttpSecurity의 .authorizeHttpRequests() 설정을 통해 대체하고, 접근 권한 설정을 커스터마이징한다.
+
+- [X] authorizeHttpRequests 추가 

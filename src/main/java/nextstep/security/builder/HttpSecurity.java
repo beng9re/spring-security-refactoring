@@ -4,6 +4,7 @@ package nextstep.security.builder;
 
 import jakarta.servlet.Filter;
 import nextstep.security.authentication.AuthenticationManager;
+import nextstep.security.authorization.AuthorizationFilter;
 import nextstep.security.config.DefaultSecurityFilterChain;
 import nextstep.security.config.SecurityFilterChain;
 
@@ -52,20 +53,26 @@ public class HttpSecurity {
         return HttpSecurity.this;
     }
 
-    public HttpSecurity httpBasic(Customizer<HttpBasicConfigure> httpBasicConfigureCustomizer) {
+    public HttpSecurity httpBasic(Customizer<HttpBasicConfigurer> httpBasicConfigureCustomizer) {
         AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        httpBasicConfigureCustomizer.customize((HttpBasicConfigure) getOrApply(new HttpBasicConfigure(authenticationManager)));
+        httpBasicConfigureCustomizer.customize((HttpBasicConfigurer) getOrApply(new HttpBasicConfigurer(authenticationManager)));
 
         return HttpSecurity.this;
     }
 
-    public HttpSecurity formLogin(Customizer<FormLoginConfigure> formLoginConfigureCustomizer) {
+    public HttpSecurity formLogin(Customizer<FormLoginConfigurer> formLoginConfigureCustomizer) {
         AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        formLoginConfigureCustomizer.customize((FormLoginConfigure) getOrApply(new FormLoginConfigure(authenticationManager)));
+        formLoginConfigureCustomizer.customize((FormLoginConfigurer) getOrApply(new FormLoginConfigurer(authenticationManager)));
 
         return HttpSecurity.this;
+    }
+
+    public HttpSecurity authorizeHttpRequests() {
+        AuthorizationFilter authorizationFilter = new AuthorizationFilter();
+
+        AuthorizationConfigurer authorizationConfigurer = new AuthorizationConfigurer()
     }
 
     public void addFilter(Filter filter) {
