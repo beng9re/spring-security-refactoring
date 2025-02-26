@@ -3,10 +3,10 @@ package nextstep.security.builder;
 import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.authentication.BasicAuthenticationFilter;
 
-public class HttpBasicConfigure implements SecurityConfigurer<HttpBasicConfigure, HttpSecurity> {
+public class HttpBasicConfigurer implements SecurityConfigurer<HttpBasicConfigurer, HttpSecurity> {
     private AuthenticationManager authenticationManager;
 
-    public HttpBasicConfigure(AuthenticationManager authenticationManager) {
+    public HttpBasicConfigurer(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 
