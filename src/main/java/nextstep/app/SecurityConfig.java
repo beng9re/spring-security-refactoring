@@ -18,6 +18,7 @@ import nextstep.security.authorization.AuthorizationManager;
 import nextstep.security.authorization.PermitAllAuthorizationManager;
 import nextstep.security.authorization.RequestMatcherDelegatingAuthorizationManager;
 import nextstep.security.authorization.SecuredMethodInterceptor;
+import nextstep.security.builder.Customizer;
 import nextstep.security.builder.HttpSecurity;
 import nextstep.security.config.DelegatingFilterProxy;
 import nextstep.security.config.EnableWebSecurity;
@@ -84,7 +85,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http.csrf((c) -> c.ignoringRequestMatchers("/login"))
-
+                .httpBasic(Customizer.withDefaults())
                 .build();
 
 
