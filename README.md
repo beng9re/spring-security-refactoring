@@ -13,5 +13,5 @@
 
 2단계 - 인증 관련 리팩토링
 기존에 직접 추가하던 UsernamePasswordAuthenticationFilter와 BasicAuthenticationFilter를 HttpSecurity의 .formLogin()과 .httpBasic() 메서드를 사용해 설정하는 방식으로 리팩터링한다.
-- [ ] formLogin 추가 
-- [ ] httpBasic 추가 
+- [X] formLogin 추가 
+- [X] httpBasic 추가 

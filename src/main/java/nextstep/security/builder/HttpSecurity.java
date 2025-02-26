@@ -60,7 +60,11 @@ public class HttpSecurity {
         return HttpSecurity.this;
     }
 
-    public HttpSecurity formLogin(Customizer<CsrfConfigurer> csrfCustomizer) {
+    public HttpSecurity formLogin(Customizer<FormLoginConfigure> formLoginConfigureCustomizer) {
+        AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
+
+        formLoginConfigureCustomizer.customize((FormLoginConfigure) getOrApply(new FormLoginConfigure(authenticationManager)));
+
         return HttpSecurity.this;
     }
 
