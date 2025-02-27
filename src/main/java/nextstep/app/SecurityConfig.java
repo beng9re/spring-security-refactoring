@@ -5,18 +5,11 @@ import nextstep.oauth2.authentication.OAuth2LoginAuthenticationProvider;
 import nextstep.oauth2.registration.ClientRegistration;
 import nextstep.oauth2.registration.ClientRegistrationRepository;
 import nextstep.oauth2.userinfo.OAuth2UserService;
-import nextstep.security.access.AnyRequestMatcher;
-import nextstep.security.access.MvcRequestMatcher;
-import nextstep.security.access.RequestMatcherEntry;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchyImpl;
 import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.authentication.DaoAuthenticationProvider;
 import nextstep.security.authentication.ProviderManager;
-import nextstep.security.authorization.AuthorityAuthorizationManager;
-import nextstep.security.authorization.AuthorizationManager;
-import nextstep.security.authorization.PermitAllAuthorizationManager;
-import nextstep.security.authorization.RequestMatcherDelegatingAuthorizationManager;
 import nextstep.security.authorization.SecuredMethodInterceptor;
 import nextstep.security.builder.Customizer;
 import nextstep.security.builder.HttpSecurity;
@@ -31,7 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpMethod;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +77,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http.csrf((c) -> c.ignoringRequestMatchers("/login"))
+
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests((it) -> it
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/members").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/members/me").hasRole("USER")
+                        .anyRequest().authenticated()
+                )
+
                 .build();
 
 
@@ -103,14 +103,6 @@ public class SecurityConfig {
 //        );
     }
 
-    @Bean
-    public RequestMatcherDelegatingAuthorizationManager requestAuthorizationManager() {
-        List<RequestMatcherEntry<AuthorizationManager>> mappings = new ArrayList<>();
-        mappings.add(new RequestMatcherEntry<>(new MvcRequestMatcher(HttpMethod.GET, "/members"), new AuthorityAuthorizationManager(roleHierarchy(), "ADMIN")));
-        mappings.add(new RequestMatcherEntry<>(new MvcRequestMatcher(HttpMethod.GET, "/members/me"), new AuthorityAuthorizationManager(roleHierarchy(), "USER")));
-        mappings.add(new RequestMatcherEntry<>(AnyRequestMatcher.INSTANCE, new PermitAllAuthorizationManager<Void>()));
-        return new RequestMatcherDelegatingAuthorizationManager(mappings);
-    }
 
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {

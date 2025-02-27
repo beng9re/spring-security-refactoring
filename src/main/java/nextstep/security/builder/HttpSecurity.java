@@ -3,6 +3,7 @@ package nextstep.security.builder;
 
 
 import jakarta.servlet.Filter;
+import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.config.DefaultSecurityFilterChain;
 import nextstep.security.config.SecurityFilterChain;
@@ -22,7 +23,6 @@ public class HttpSecurity {
     public HttpSecurity(AuthenticationManager authenticationManager) {
         setSharedObject(AuthenticationManager.class, authenticationManager);
     }
-
 
     public void setSharedObject(Class<?> key, Object value) {
         sharedObjects.put(key, value);
@@ -52,18 +52,26 @@ public class HttpSecurity {
         return HttpSecurity.this;
     }
 
-    public HttpSecurity httpBasic(Customizer<HttpBasicConfigure> httpBasicConfigureCustomizer) {
+    public HttpSecurity httpBasic(Customizer<HttpBasicConfigurer> httpBasicConfigureCustomizer) {
         AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        httpBasicConfigureCustomizer.customize((HttpBasicConfigure) getOrApply(new HttpBasicConfigure(authenticationManager)));
+        httpBasicConfigureCustomizer.customize((HttpBasicConfigurer) getOrApply(new HttpBasicConfigurer(authenticationManager)));
 
         return HttpSecurity.this;
     }
 
-    public HttpSecurity formLogin(Customizer<FormLoginConfigure> formLoginConfigureCustomizer) {
+    public HttpSecurity formLogin(Customizer<FormLoginConfigurer> formLoginConfigureCustomizer) {
         AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        formLoginConfigureCustomizer.customize((FormLoginConfigure) getOrApply(new FormLoginConfigure(authenticationManager)));
+        formLoginConfigureCustomizer.customize((FormLoginConfigurer) getOrApply(new FormLoginConfigurer(authenticationManager)));
+
+        return HttpSecurity.this;
+    }
+
+    public HttpSecurity authorizeHttpRequests(Customizer<AuthorizationConfigurer> authenticationManager) {
+        RoleHierarchy roleHierarchy = (RoleHierarchy) sharedObjects.get(RoleHierarchy.class);
+
+        authenticationManager.customize((AuthorizationConfigurer) getOrApply(new AuthorizationConfigurer(roleHierarchy)));
 
         return HttpSecurity.this;
     }
