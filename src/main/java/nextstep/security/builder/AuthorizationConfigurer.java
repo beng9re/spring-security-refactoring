@@ -45,6 +45,10 @@ public class AuthorizationConfigurer implements SecurityConfigurer<Authorization
         return authorizedEntry;
     }
 
+    public AuthorizedEntry anyRequest() {
+        return new AuthorizedEntry(AnyRequestMatcher.INSTANCE);
+    }
+
     public class AuthorizedEntry {
         private final RequestMatcher requestMatcher;
 
