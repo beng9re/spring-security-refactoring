@@ -3,6 +3,7 @@ package nextstep.security.builder;
 
 
 import jakarta.servlet.Filter;
+import nextstep.oauth2.registration.ClientRegistrationRepository;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.config.DefaultSecurityFilterChain;
@@ -72,6 +73,23 @@ public class HttpSecurity {
         RoleHierarchy roleHierarchy = (RoleHierarchy) sharedObjects.get(RoleHierarchy.class);
 
         authenticationManager.customize((AuthorizationConfigurer) getOrApply(new AuthorizationConfigurer(roleHierarchy)));
+
+        return HttpSecurity.this;
+    }
+
+    public HttpSecurity securityContext(Customizer<SecurityContextConfigurer> securityContextCustomizer) {
+        securityContextCustomizer.customize((SecurityContextConfigurer) getOrApply(new SecurityContextConfigurer()));
+
+        return HttpSecurity.this;
+    }
+
+    public HttpSecurity oauth2Login(Customizer<OAuth2Configurer> oauth2ConfigurerCustomizer) {
+        AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
+        ClientRegistrationRepository clientRegistrationRepository = (ClientRegistrationRepository) sharedObjects.get(ClientRegistrationRepository.class);
+
+        OAuth2Configurer oAuth2Configurer = new OAuth2Configurer(clientRegistrationRepository, authenticationManager);
+
+        oauth2ConfigurerCustomizer.customize((OAuth2Configurer) getOrApply(oAuth2Configurer));
 
         return HttpSecurity.this;
     }

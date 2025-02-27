@@ -1,5 +1,6 @@
 package nextstep.security.config;
 
+import nextstep.oauth2.registration.ClientRegistrationRepository;
 import nextstep.security.access.hierarchicalroles.NullRoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.authentication.AuthenticationManager;
@@ -13,15 +14,19 @@ public class HttpSecurityConfiguration {
 
     @Bean
     @Scope("prototype")
-    public HttpSecurity httpSecurity(AuthenticationManager authenticationManager
+    public HttpSecurity httpSecurity(
+              AuthenticationManager authenticationManager
             , RoleHierarchy roleHierarchy
+            , ClientRegistrationRepository clientRegistrationRepository
     ) {
+
         if (roleHierarchy == null) {
             roleHierarchy = new NullRoleHierarchy();
         }
 
         HttpSecurity httpSecurity = new HttpSecurity(authenticationManager);
         httpSecurity.setSharedObject(RoleHierarchy.class, roleHierarchy);
+        httpSecurity.setSharedObject(ClientRegistrationRepository.class, clientRegistrationRepository);
 
         return httpSecurity;
     }
