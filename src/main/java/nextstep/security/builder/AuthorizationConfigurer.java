@@ -37,10 +37,12 @@ public class AuthorizationConfigurer implements SecurityConfigurer<Authorization
         builder.addFilter(authorizationFilter);
     }
 
+    public AuthorizedEntry requestMatchers(RequestMatcher matcher) {
+        return new AuthorizedEntry(matcher);
+    }
 
     public AuthorizedEntry requestMatchers(String url) {
-        AuthorizedEntry authorizedEntry = new AuthorizedEntry(new MvcRequestMatcher(HttpMethod.GET, url));
-        return authorizedEntry;
+        return requestMatchers(new MvcRequestMatcher(HttpMethod.GET, url));
     }
 
     public AuthorizedEntry anyRequest() {
@@ -55,7 +57,7 @@ public class AuthorizationConfigurer implements SecurityConfigurer<Authorization
         }
 
         public AuthorizedEntry requestMatchers(String url) {
-            return new AuthorizedEntry(new MvcRequestMatcher(HttpMethod.GET, url));
+            return requestMatchers(HttpMethod.GET, url);
         }
 
         public AuthorizedEntry requestMatchers(HttpMethod method, String url) {
