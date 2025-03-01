@@ -48,14 +48,14 @@ public class HttpSecurity {
     }
 
     public HttpSecurity csrf(Customizer<CsrfConfigurer> csrfCustomizer) {
-        csrfCustomizer.customize((CsrfConfigurer) getOrApply(new CsrfConfigurer()));
+        csrfCustomizer.customize(getOrApply(new CsrfConfigurer()));
         return HttpSecurity.this;
     }
 
     public HttpSecurity httpBasic(Customizer<HttpBasicConfigurer> httpBasicConfigureCustomizer) {
         AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        httpBasicConfigureCustomizer.customize((HttpBasicConfigurer) getOrApply(new HttpBasicConfigurer(authenticationManager)));
+        httpBasicConfigureCustomizer.customize(getOrApply(new HttpBasicConfigurer(authenticationManager)));
 
         return HttpSecurity.this;
     }
@@ -63,7 +63,7 @@ public class HttpSecurity {
     public HttpSecurity formLogin(Customizer<FormLoginConfigurer> formLoginConfigureCustomizer) {
         AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        formLoginConfigureCustomizer.customize((FormLoginConfigurer) getOrApply(new FormLoginConfigurer(authenticationManager)));
+        formLoginConfigureCustomizer.customize(getOrApply(new FormLoginConfigurer(authenticationManager)));
 
         return HttpSecurity.this;
     }
@@ -71,13 +71,13 @@ public class HttpSecurity {
     public HttpSecurity authorizeHttpRequests(Customizer<AuthorizationConfigurer> authenticationManager) {
         RoleHierarchy roleHierarchy = (RoleHierarchy) sharedObjects.get(RoleHierarchy.class);
 
-        authenticationManager.customize((AuthorizationConfigurer) getOrApply(new AuthorizationConfigurer(roleHierarchy)));
+        authenticationManager.customize(getOrApply(new AuthorizationConfigurer(roleHierarchy)));
 
         return HttpSecurity.this;
     }
 
     public HttpSecurity securityContext(Customizer<SecurityContextConfigurer> securityContextCustomizer) {
-        securityContextCustomizer.customize((SecurityContextConfigurer) getOrApply(new SecurityContextConfigurer()));
+        securityContextCustomizer.customize(getOrApply(new SecurityContextConfigurer()));
 
         return HttpSecurity.this;
     }
@@ -88,7 +88,7 @@ public class HttpSecurity {
 
         OAuth2Configurer oAuth2Configurer = new OAuth2Configurer(clientRegistrationRepository, authenticationManager);
 
-        oauth2ConfigurerCustomizer.customize((OAuth2Configurer) getOrApply(oAuth2Configurer));
+        oauth2ConfigurerCustomizer.customize(getOrApply(oAuth2Configurer));
 
         return HttpSecurity.this;
     }
@@ -97,7 +97,7 @@ public class HttpSecurity {
         this.filters.add(filter);
     }
 
-    private SecurityConfigurer getOrApply(SecurityConfigurer configurer) {
+    private <T extends SecurityConfigurer> T getOrApply(T configurer) {
         this.configurers.put(configurer.getClass(), configurer);
         return configurer;
     }
