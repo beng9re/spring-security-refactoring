@@ -15,13 +15,6 @@ import java.util.Map;
 @EnableConfigurationProperties(OAuth2ClientProperties.class)
 class OAuth2ClientRegistrationRepositoryConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean(ClientRegistrationRepository.class)
-    public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties) {
-        Map<String, ClientRegistration> registrations = getClientRegistrations(properties);
-        return new ClientRegistrationRepository(registrations);
-    }
-
     private static Map<String, ClientRegistration> getClientRegistrations(OAuth2ClientProperties properties) {
         Map<String, ClientRegistration> clientRegistrations = new HashMap<>();
 
@@ -35,5 +28,12 @@ class OAuth2ClientRegistrationRepositoryConfiguration {
     private static ClientRegistration getClientRegistration(String registrationId,
                                                             OAuth2ClientProperties.Registration registration, OAuth2ClientProperties.Provider provider) {
         return new ClientRegistration(registrationId, registration.getClientId(), registration.getClientSecret(), registration.getRedirectUri(), registration.getScope(), provider.getAuthorizationUri(), provider.getTokenUri(), provider.getUserInfoUri(), provider.getUserNameAttributeName());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(ClientRegistrationRepository.class)
+    public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties) {
+        Map<String, ClientRegistration> registrations = getClientRegistrations(properties);
+        return new ClientRegistrationRepository(registrations);
     }
 }

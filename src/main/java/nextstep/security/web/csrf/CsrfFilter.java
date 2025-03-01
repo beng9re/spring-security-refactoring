@@ -21,7 +21,7 @@ public class CsrfFilter extends OncePerRequestFilter {
     public CsrfFilter(RequestMatcher requireCsrfProtectionMatcher, Set<MvcRequestMatcher> ignoringRequestMatchers) {
         this.requireCsrfProtectionMatcher = requireCsrfProtectionMatcher;
         this.ignoringRequestMatchers = ignoringRequestMatchers;
-        this.tokenRepository  = new CsrfTokenRepository();
+        this.tokenRepository = new CsrfTokenRepository();
     }
 
     @Override

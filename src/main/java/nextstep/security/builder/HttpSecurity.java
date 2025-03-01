@@ -1,4 +1,3 @@
-
 package nextstep.security.builder;
 
 
@@ -17,8 +16,8 @@ import java.util.Map;
 
 public class HttpSecurity {
     private final LinkedHashMap<Class<? extends SecurityConfigurer>, SecurityConfigurer> configurers = new LinkedHashMap<>();
-    private List<Filter> filters = new ArrayList<>();
     private final Map<Class<?>, Object> sharedObjects = new HashMap<>();
+    private List<Filter> filters = new ArrayList<>();
 
 
     public HttpSecurity(AuthenticationManager authenticationManager) {

@@ -29,8 +29,6 @@ public class AuthorizationConfigurer implements SecurityConfigurer<Authorization
 
     @Override
     public void init(HttpSecurity builder) {
-
-
     }
 
     @Override

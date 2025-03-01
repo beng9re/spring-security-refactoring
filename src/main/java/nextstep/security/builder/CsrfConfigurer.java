@@ -22,6 +22,14 @@ public class CsrfConfigurer implements SecurityConfigurer<CsrfFilter, HttpSecuri
         builder.addFilter(csrfFilter);
     }
 
+    public CsrfConfigurer ignoringRequestMatchers(String... patterns) {
+        for (String pattern : patterns) {
+            MvcRequestMatcher mvc = new MvcRequestMatcher(null, pattern);
+            ignoringRequestMatchers.add(mvc);
+        }
+        return this;
+    }
+
     private static final class DefaultRequiresCsrfMatcher implements RequestMatcher {
 
         private final HashSet<String> allowedMethods = new HashSet<>(Arrays.asList("GET", "HEAD", "TRACE", "OPTIONS"));
@@ -35,14 +43,5 @@ public class CsrfConfigurer implements SecurityConfigurer<CsrfFilter, HttpSecuri
         public String toString() {
             return "CsrfNotRequired " + this.allowedMethods;
         }
-    }
-
-
-    public CsrfConfigurer ignoringRequestMatchers(String... patterns) {
-        for (String pattern : patterns) {
-            MvcRequestMatcher mvc = new MvcRequestMatcher(null, pattern);
-            ignoringRequestMatchers.add(mvc);
-        }
-        return this;
     }
 }

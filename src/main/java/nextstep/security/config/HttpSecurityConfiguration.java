@@ -15,7 +15,7 @@ public class HttpSecurityConfiguration {
     @Bean
     @Scope("prototype")
     public HttpSecurity httpSecurity(
-              AuthenticationManager authenticationManager
+            AuthenticationManager authenticationManager
             , RoleHierarchy roleHierarchy
             , ClientRegistrationRepository clientRegistrationRepository
     ) {
