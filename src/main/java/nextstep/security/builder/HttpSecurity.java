@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class HttpSecurity {
     private final LinkedHashMap<Class<? extends SecurityConfigurer>, SecurityConfigurer> configurers = new LinkedHashMap<>();
@@ -48,57 +49,73 @@ public class HttpSecurity {
     }
 
     public HttpSecurity csrf(Customizer<CsrfConfigurer> csrfCustomizer) {
-        csrfCustomizer.customize(getOrApply(new CsrfConfigurer()));
+        csrfCustomizer.customize(getOrApply(CsrfConfigurer.class, CsrfConfigurer::new));
+
         return HttpSecurity.this;
     }
 
     public HttpSecurity httpBasic(Customizer<HttpBasicConfigurer> httpBasicConfigureCustomizer) {
-        AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
+        final HttpBasicConfigurer httpBasicConfigurer = getOrApply(HttpBasicConfigurer.class, () -> {
+            AuthenticationManager authenticationManager = getSharedObjects(AuthenticationManager.class);
+            return new HttpBasicConfigurer(authenticationManager);
+        });
 
-        httpBasicConfigureCustomizer.customize(getOrApply(new HttpBasicConfigurer(authenticationManager)));
+        httpBasicConfigureCustomizer.customize(httpBasicConfigurer);
 
         return HttpSecurity.this;
     }
 
-    public HttpSecurity formLogin(Customizer<FormLoginConfigurer> formLoginConfigureCustomizer) {
-        AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
 
-        formLoginConfigureCustomizer.customize(getOrApply(new FormLoginConfigurer(authenticationManager)));
+    public HttpSecurity formLogin(Customizer<FormLoginConfigurer> formLoginConfigureCustomizer) {
+        final FormLoginConfigurer formLoginConfigurer = getOrApply(FormLoginConfigurer.class, () ->
+                new FormLoginConfigurer(getSharedObjects(AuthenticationManager.class))
+        );
+
+        formLoginConfigureCustomizer.customize(formLoginConfigurer);
 
         return HttpSecurity.this;
     }
 
     public HttpSecurity authorizeHttpRequests(Customizer<AuthorizationConfigurer> authenticationManager) {
-        RoleHierarchy roleHierarchy = (RoleHierarchy) sharedObjects.get(RoleHierarchy.class);
+        AuthorizationConfigurer authorizationConfigurer = getOrApply(AuthorizationConfigurer.class, () ->
+                new AuthorizationConfigurer(getSharedObjects(RoleHierarchy.class))
+        );
 
-        authenticationManager.customize(getOrApply(new AuthorizationConfigurer(roleHierarchy)));
+        authenticationManager.customize(authorizationConfigurer);
 
         return HttpSecurity.this;
     }
 
     public HttpSecurity securityContext(Customizer<SecurityContextConfigurer> securityContextCustomizer) {
-        securityContextCustomizer.customize(getOrApply(new SecurityContextConfigurer()));
+        securityContextCustomizer.customize(getOrApply(SecurityContextConfigurer.class, SecurityContextConfigurer::new));
 
         return HttpSecurity.this;
     }
 
     public HttpSecurity oauth2Login(Customizer<OAuth2Configurer> oauth2ConfigurerCustomizer) {
-        AuthenticationManager authenticationManager = (AuthenticationManager) sharedObjects.get(AuthenticationManager.class);
-        ClientRegistrationRepository clientRegistrationRepository = (ClientRegistrationRepository) sharedObjects.get(ClientRegistrationRepository.class);
+        final OAuth2Configurer oAuth2Configurer = getOrApply(OAuth2Configurer.class, () -> {
+            ClientRegistrationRepository clientRegistrationRepository = getSharedObjects(ClientRegistrationRepository.class);
+            AuthenticationManager authenticationManager = getSharedObjects(AuthenticationManager.class);
 
-        OAuth2Configurer oAuth2Configurer = new OAuth2Configurer(clientRegistrationRepository, authenticationManager);
+            return new OAuth2Configurer(clientRegistrationRepository, authenticationManager);
+        });
 
-        oauth2ConfigurerCustomizer.customize(getOrApply(oAuth2Configurer));
+        oauth2ConfigurerCustomizer.customize(oAuth2Configurer);
 
         return HttpSecurity.this;
     }
+
+    public <T> T getSharedObjects(Class<T> key) {
+        return (T) sharedObjects.get(key);
+    }
+
+    private <T extends SecurityConfigurer> T getOrApply(Class<T> configurerClass, Supplier<T> configurerSupplier) {
+        return (T) this.configurers.computeIfAbsent(configurerClass, key -> configurerSupplier.get());
+    }
+
 
     public void addFilter(Filter filter) {
         this.filters.add(filter);
     }
 
-    private <T extends SecurityConfigurer> T getOrApply(T configurer) {
-        this.configurers.put(configurer.getClass(), configurer);
-        return configurer;
-    }
 }
