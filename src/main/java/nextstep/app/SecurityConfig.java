@@ -5,6 +5,7 @@ import nextstep.oauth2.authentication.OAuth2LoginAuthenticationProvider;
 import nextstep.oauth2.registration.ClientRegistration;
 import nextstep.oauth2.registration.ClientRegistrationRepository;
 import nextstep.oauth2.userinfo.OAuth2UserService;
+import nextstep.oauth2.web.OAuth2AuthorizationRequestResolver;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchyImpl;
 import nextstep.security.authentication.AuthenticationManager;
@@ -73,7 +74,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   ClientRegistrationRepository clientRegistrationRepository
+    ) {
         return http
                 .securityContext(Customizer.withDefaults())
                 .authorizeHttpRequests((it) -> it
@@ -85,7 +88,11 @@ public class SecurityConfig {
                 .csrf((c) -> c.ignoringRequestMatchers("/login"))
                 .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
-                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login((oauth2) -> oauth2
+                        .clientRegistrationRepository(clientRegistrationRepository)
+                        .authorizationEndpoint(endpoint ->
+                                endpoint.authorizationRequestResolver(new OAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/oauth2/authorization/")))
+                )
                 .build();
     }
 
