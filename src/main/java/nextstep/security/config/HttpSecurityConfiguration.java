@@ -5,6 +5,7 @@ import nextstep.security.access.hierarchicalroles.NullRoleHierarchy;
 import nextstep.security.access.hierarchicalroles.RoleHierarchy;
 import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.builder.HttpSecurity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -16,8 +17,8 @@ public class HttpSecurityConfiguration {
     @Scope("prototype")
     public HttpSecurity httpSecurity(
             AuthenticationManager authenticationManager
-            , RoleHierarchy roleHierarchy
             , ClientRegistrationRepository clientRegistrationRepository
+            , @Autowired(required = false) RoleHierarchy roleHierarchy
     ) {
 
         if (roleHierarchy == null) {
