@@ -14,7 +14,15 @@ public class CsrfTokenRepository {
     private static final String DEFAULT_CSRF_TOKEN_ATTR_NAME = CsrfTokenRepository.class.getName()
             .concat(".CSRF_TOKEN");
 
-    private final String sessionAttributeName = DEFAULT_CSRF_TOKEN_ATTR_NAME;
+    private final String sessionAttributeName;
+
+    private CsrfTokenRepository(String sessionAttributeName) {
+        this.sessionAttributeName = sessionAttributeName;
+    }
+
+    public CsrfTokenRepository() {
+        this(DEFAULT_CSRF_TOKEN_ATTR_NAME);
+    }
 
     public void saveToken(CsrfToken token, HttpServletRequest request, HttpServletResponse response) {
         if (token != null) {
