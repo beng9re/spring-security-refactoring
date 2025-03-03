@@ -74,17 +74,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        return http.csrf((c) -> c.ignoringRequestMatchers("/login"))
+        return http
                 .securityContext(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults())
-                .oauth2Login(Customizer.withDefaults())
                 .authorizeHttpRequests((it) -> it
                         .requestMatchers("/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/members").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/members/me").hasRole("USER")
                         .anyRequest().permitAll()
                 )
+                .csrf((c) -> c.ignoringRequestMatchers("/login"))
+                .formLogin(Customizer.withDefaults())
+                .httpBasic(Customizer.withDefaults())
+                .oauth2Login(Customizer.withDefaults())
                 .build();
     }
 

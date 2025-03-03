@@ -8,18 +8,15 @@ import nextstep.security.authentication.AuthenticationManager;
 import nextstep.security.config.DefaultSecurityFilterChain;
 import nextstep.security.config.SecurityFilterChain;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class HttpSecurity {
     private final LinkedHashMap<Class<? extends SecurityConfigurer>, SecurityConfigurer> configurers = new LinkedHashMap<>();
     private final Map<Class<?>, Object> sharedObjects = new HashMap<>();
-    private List<Filter> filters = new ArrayList<>();
-
+    private final SecurityFilterOrderRegistration securityFilterOrderRegistration = new SecurityFilterOrderRegistration();
 
     public HttpSecurity(AuthenticationManager authenticationManager) {
         setSharedObject(AuthenticationManager.class, authenticationManager);
@@ -33,7 +30,7 @@ public class HttpSecurity {
     public SecurityFilterChain build() {
         init();
         configure();
-        return new DefaultSecurityFilterChain(filters);
+        return new DefaultSecurityFilterChain(securityFilterOrderRegistration.getFilters());
     }
 
     private void init() {
@@ -115,7 +112,7 @@ public class HttpSecurity {
 
 
     public void addFilter(Filter filter) {
-        this.filters.add(filter);
+        this.securityFilterOrderRegistration.addFilter(filter);
     }
 
 }
