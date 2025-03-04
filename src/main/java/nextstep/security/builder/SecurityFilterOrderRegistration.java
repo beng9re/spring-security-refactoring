@@ -12,20 +12,26 @@ public class SecurityFilterOrderRegistration {
 
     private int currentFilterOrder = SecurityFilterOrder.values().length + 1;
 
+
     public void addFilter(Filter filter) {
         if (SecurityFilterOrder.isSecurityFilter(filter.getClass())) {
-            filters.add(new OrderedFilter(SecurityFilterOrder.findOrder(filter.getClass()), filter));
+            filters.add(OrderedFilter.baseFilter(SecurityFilterOrder.findOrder(filter.getClass()), filter));
             return;
         }
 
         Order orderAnnotation = filter.getClass().getAnnotation(Order.class);
         if (orderAnnotation != null) {
-            filters.add(new OrderedFilter(orderAnnotation.value(), filter));
+            filters.add(OrderedFilter.baseFilter(orderAnnotation.value(), filter));
             return;
         }
 
-        filters.add(new OrderedFilter(currentFilterOrder, filter));
+        filters.add(OrderedFilter.baseFilter(currentFilterOrder, filter));
         currentFilterOrder++;
+
+    }
+
+    public void afterFilter(Class<? extends Filter> filterClass, Filter filter) {
+
     }
 
     public List<Filter> getFilters() {
